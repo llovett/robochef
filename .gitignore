@@ -37,3 +37,6 @@ nosetests.xml
 # Emacs
 .swp_emacs
 *~
+
+# Our project-specific stuff
+scraper/ingredients_list.dat
