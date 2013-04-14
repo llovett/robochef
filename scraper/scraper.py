@@ -1,11 +1,13 @@
 import urllib2
-import cPickle
+import codecs
+from threading import Thread
+from Queue import Queue
 from bs4 import BeautifulSoup
 
 # All the ingredients we've found while crawling
 INGREDIENTS = set()
 # Number of pages to search through for each recipe category
-MAX_PAGES = 1
+MAX_PAGES = 10
 # Shows a page of salad recipes
 URL = "http://allrecipes.com/recipes/salad/ViewAll.aspx?SortBy=Rating&Direction=Descending&Page=%d"
 
@@ -25,10 +27,13 @@ def parseRecipe(url):
         # Ignore "empty" ingredients... don't know why these are in the HTML.
         if ing_amnt <= 0:
             continue
-        ing_name = ingredient.find(class_='ingredient-name')
+        ing_name = ingredient.find(class_='ingredient-name').string
+        # Get rid of "to taste" in recipe names
+        if 'to taste' in ing_name:
+            ing_name = ','.join(ing_name.split(',')[:-1])
         INGREDIENTS.add(ing_name)
         # Assume if there is no ingredient amount that the amount is very small
-        ingredients.append( (ing_amnt, ing_name.string) )
+        ingredients.append( (ing_amnt, ing_name) )
     return ingredients
 
 def parseListing(url, pagenum):
@@ -43,14 +48,16 @@ def parseListing(url, pagenum):
         if not rating or float(rating) < 4.0:
             continue
         rlink = recipe.find('div',class_='rectitlediv').h3.a.get('href')
-        print rating, rlink
-        print parseRecipe(rlink)
+        print '>',rlink
+        parseRecipe(rlink)
 
 if __name__ == '__main__':
     for i in xrange(1,MAX_PAGES+1):
+        print "Examining page %d"%i
         parseListing(URL, i)
 
-    # Pickle our list of ingredients
-    with open("ingredients_list.dat","wb") as pickled:
-        cPickle.dump(list(INGREDIENTS),pickled,protocol=2)
-
+    # Save the list of ingredients
+    f = codecs.open("ingredients_list.dat","w","utf-8")
+    for ingredient in INGREDIENTS:
+        f.write(ingredient+"\n")
+    f.close()
