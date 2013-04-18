@@ -75,12 +75,14 @@ def startThreads():
         t.start()
         Pool.append(t)
 
-def allRecipes():
-    try:
-        while True:
-            yield _recipes.get_nowait()
-    except Queue.Empty:
-        pass
+def allObject(q):
+    def allQ():
+        try:
+            while True:
+                yield q.get_nowait()
+        except Queue.Empty:
+            pass
+    return allQ
 
 if __name__ == '__main__':
     for i in xrange(1,MAX_PAGES+1):
@@ -92,10 +94,27 @@ if __name__ == '__main__':
     for t in Pool:
         t.join()
 
-    # Save the list of ingredients:
+
+    # Write the table of ingredient associations
+    allIngredients = allObject(_ingredients)
+    associations = {}
+    for ing in allIngredients():
+        # Make a map for each ingredient
+        associations[ing[0]] = {}
+    # Iterate over all ingredients:
     # Use utf-8 to preserve hilarious brand-name references and trademarks in
     # the ingredients listing
     f = codecs.open("ingredients_list.dat","w","utf-8")
+    allRecipes = allObject(_recipes)
     for recipe in allRecipes():
         f.write("%s\n"%("###".join(ingredient[0] for ingredient in recipe)))
+        for ingredient in recipe:
+            for other_ingredient in recipe:
+                if not other_ingredient[0] in associations[ingredient[0]].keys():
+                    associations[ingredient[0]][other_ingredient[0]] = 0
+                else:
+                    associations[ingredient[0]][other_ingredient[0]] += 1
+
     f.close()
+
+    print associations
