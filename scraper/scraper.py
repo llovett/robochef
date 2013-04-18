@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 # All the ingredients we've found while crawling
 INGREDIENTS = set()
 # Number of pages to search through for each recipe category
-MAX_PAGES = 10
+MAX_PAGES = 1
 # Shows a page of salad recipes
 URL = "http://allrecipes.com/recipes/salad/ViewAll.aspx?SortBy=Rating&Direction=Descending&Page=%d"
 # Number of threads
@@ -15,7 +15,9 @@ THREAD_COUNT = 10
 
 # Input queue -- contains recipe URLs to be scraped
 _urls = Queue.Queue()
-# Output queue - contains ingredients scraped from recipes
+# Output queue - contains ingredient listings scraped from recipes
+_recipes = Queue.Queue()
+# Output queue - contains all ingredients found
 _ingredients = Queue.Queue()
 # Error log
 _errors = Queue.Queue()
@@ -48,7 +50,10 @@ def parseRecipe():
             # Get rid of "to taste" in recipe names
             if 'to taste' in ing_name:
                 ing_name = ','.join(ing_name.split(',')[:-1])
+            ingredients.append((ing_name,ing_amnt))
             _ingredients.put((ing_name,ing_amnt))
+        # Add ingredients to Recipe
+        _recipes.put(ingredients)
 
 def parseListing(url, pagenum):
     '''Parses a listing of recipes given at a <url> at page <pagenum>'''
@@ -62,8 +67,6 @@ def parseListing(url, pagenum):
         if not rating or float(rating) < 4.0:
             continue
         rlink = recipe.find('div',class_='rectitlediv').h3.a.get('href')
-        # print '>',rlink
-        # parseRecipe(rlink)
         _urls.put(rlink)
 
 def startThreads():
@@ -72,10 +75,10 @@ def startThreads():
         t.start()
         Pool.append(t)
 
-def allIngredients():
+def allRecipes():
     try:
         while True:
-            yield _ingredients.get_nowait()
+            yield _recipes.get_nowait()
     except Queue.Empty:
         pass
 
@@ -93,6 +96,6 @@ if __name__ == '__main__':
     # Use utf-8 to preserve hilarious brand-name references and trademarks in
     # the ingredients listing
     f = codecs.open("ingredients_list.dat","w","utf-8")
-    for ingredient in allIngredients():
-        f.write("%s::%f\n"%(ingredient[0],ingredient[1]))
+    for recipe in allRecipes():
+        f.write("%s\n"%("###".join(ingredient[0] for ingredient in recipe)))
     f.close()
