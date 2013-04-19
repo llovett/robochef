@@ -42,13 +42,14 @@ def parseRecipe():
         ingredients = []
         for ingredient in ingredients_html:
             ing_amnt = float(ingredient.get('data-grams'))
-            # Ignore "empty" ingredients... don't know why these are in the HTML.
+            # Ignore "empty" ingredients (no amount)
             if ing_amnt <= 0:
                 continue
             ing_name = ingredient.find(class_='ingredient-name').string.strip()
             # Get rid of "to taste" in recipe names
             if 'to taste' in ing_name:
                 ing_name = ','.join(ing_name.split(',')[:-1])
+            # Ignore "empty" ingredients (no name)
             if len(ing_name) < 1:
                 continue
             ingredients.append((ing_name,ing_amnt))
