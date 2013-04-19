@@ -9,7 +9,7 @@ MAX_PAGES = 1
 # Shows a page of salad recipes
 URL = "http://allrecipes.com/recipes/salad/ViewAll.aspx?SortBy=Rating&Direction=Descending&Page=%d"
 # Number of threads
-THREAD_COUNT = 10
+THREAD_COUNT = 20
 
 # Input queue -- contains recipe URLs to be scraped
 _urls = Queue.Queue()
@@ -109,10 +109,13 @@ def allObject(q):
 def print_associations(assoc):
     '''Prints an associations table. Useful for debugging.'''
     for key,val in assoc.iteritems():
-        associated = [str(v) for v in val.items() if v[1] > 0]
+        associated = ["%s (%d)"%(v[0],v[1]) for v in val.items() if v[1] > 0]
         if len(associated) > 0:
-            print "{:<10} {:>15}".format(key+":", ", ".join(associated))
-
+            print key.upper()
+            for a in associated:
+                print " "*10,a
+            print
+                
 if __name__ == '__main__':
     for i in xrange(1,MAX_PAGES+1):
         print "Examining page %d"%i
