@@ -111,8 +111,10 @@ def allObject(q):
 def print_associations(assoc):
     '''Prints an associations table. Useful for debugging.'''
     for key,val in assoc.iteritems():
-        associated = ["%s (%d)"%(v[0],v[1]) for v in val.items() if v[1] > 0]
-        if len(associated) > 0:
+        items = sorted([v for v in val.items() if v[1] > 0],
+                       cmp=lambda x,y:int(y[1])-int(x[1]))
+        if len(items) > 0:
+            associated = ["%s (%d)"%(v[0],v[1]) for v in items]
             print key.upper()
             for a in associated:
                 print " "*10,a
