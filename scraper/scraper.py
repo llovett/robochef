@@ -5,11 +5,11 @@ from bs4 import BeautifulSoup
 # All the ingredients we've found while crawling
 INGREDIENTS = set()
 # Number of pages to search through for each recipe category
-MAX_PAGES = 1
+MAX_PAGES = 10
 # Shows a page of salad recipes
 URL = "http://allrecipes.com/recipes/salad/ViewAll.aspx?SortBy=Rating&Direction=Descending&Page=%d"
 # Number of threads
-THREAD_COUNT = 20
+THREAD_COUNT = 50
 
 # Input queue -- contains recipe URLs to be scraped
 _urls = Queue.Queue()
@@ -35,7 +35,6 @@ def parseRecipe():
             url = _urls.get_nowait()
         except Queue.Empty:
             exit()
-        _log.put("> %s"%url)
         page = urllib2.urlopen(url)
         soup = BeautifulSoup(page)
         ingredients_html = soup.find_all(id='liIngredient')
@@ -56,6 +55,8 @@ def parseRecipe():
             _ingredients.put((ing_name,ing_amnt))
         # Add ingredients to Recipe
         _recipes.put(ingredients)
+        # Log this URL as scraped
+        _log.put("> %s"%url)
 
 def parseListing(url, pagenum):
     '''Parses a listing of recipes given at a <url> at page <pagenum>'''
@@ -117,6 +118,54 @@ def print_associations(assoc):
                 print " "*10,a
             print
                 
+def load_associations(filename):
+    '''Loads a table of ingredient associations from a file.
+
+    Returns the table in the following format:
+    {'A':
+      {'B': number_of_times_B_appears_with_A,
+       'C': number_of_times_C_appears_with_A,
+       'D': number_of_times_D_appears_with_A,
+       ... },
+     'B':
+      {'E': number_of_times_E_appears_with_B,
+       'F': number_of_times_F_appears_with_B,
+       ... },
+     ...
+    }
+
+    Where A-F are names of ingredients, and appearance counts are ints.
+    '''
+    associations = {}
+    # Dump associations table into a file
+    with codecs.open(filename,"r","utf-8") as f:
+        # Get list of ingredients
+        ingredients = ["%s"%s for s in f.readline().split("###")]
+        for i in ingredients:
+            associations[i] = {}
+            counts = []
+            for index,number in enumerate(f.readline().split("#")):
+                count = int(number)
+                if count > 0:
+                    associations[i][ingredients[index]] = count
+    return associations
+
+def count_appearances(a, b, associations):
+    '''Returns the number of times ingredient <a> appears with ingredient <b>,
+    accordint to the associations table <associations>.
+    
+    a, b are both strings.
+    Returns an int.
+    '''
+    return associations[a].get(b) or 0
+
+def _test_associations(filename):
+    a = load_associations(filename)
+    ingredients = a.keys()
+    for i in ingredients:
+        for j in ingredients:
+            print "%s with %s = %d"%(i,j,count_appearances(i,j,a))
+
 if __name__ == '__main__':
     for i in xrange(1,MAX_PAGES+1):
         print "Examining page %d"%i
@@ -138,19 +187,28 @@ if __name__ == '__main__':
     # Iterate over all ingredients:
     # Use utf-8 to preserve hilarious brand-name references and trademarks in
     # the ingredients listing
-    f = codecs.open("ingredients_list.dat","w","utf-8")
-    allRecipes = allObject(_recipes)
-    for recipe in allRecipes():
-        f.write("%s\n"%("###".join(ingredient[0] for ingredient in recipe)))
-        for ingredient in recipe:
-            for other_ingredient in recipe:
-                if other_ingredient == ingredient:
-                    continue
-                if not other_ingredient[0] in associations[ingredient[0]].keys():
-                    associations[ingredient[0]][other_ingredient[0]] = 0
-                else:
-                    associations[ingredient[0]][other_ingredient[0]] += 1
+    with codecs.open("ingredients_list.dat","w","utf-8") as f:
+        allRecipes = allObject(_recipes)
+        for recipe in allRecipes():
+            f.write("%s\n"%("###".join(ingredient[0] for ingredient in recipe)))
+            for ingredient in recipe:
+                for other_ingredient in recipe:
+                    if other_ingredient == ingredient:
+                        continue
+                    if not other_ingredient[0] in associations[ingredient[0]].keys():
+                        associations[ingredient[0]][other_ingredient[0]] = 0
+                    else:
+                        associations[ingredient[0]][other_ingredient[0]] += 1
 
-    f.close()
-
-    print_associations(associations)
+    # Dump associations table into a file
+    with codecs.open("associations.dat","w","utf-8") as f:
+        ingredients = associations.keys()
+        # Header: contains all ingredients as list delimited by "###"
+        f.write("%s\n"%("###".join(ingredients)))
+        for i in ingredients:
+            counts = []
+            for j in ingredients:
+                count = associations[i].get(j)
+                counts.append(str(count) if count else "0")
+            # Associations counts
+            f.write("%s\n"%("#".join(counts)))

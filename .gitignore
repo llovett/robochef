@@ -40,3 +40,5 @@ nosetests.xml
 
 # Our project-specific stuff
 scraper/ingredients_list.dat
+scraper/associations.dat
+
