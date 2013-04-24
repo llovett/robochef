@@ -1,0 +1,23 @@
+-----
+TODO:
+-----
+* implement random distribution for selecting parents
+* choose type of crossover -> ingredient by ingredient, or cross at a
+* certain point
+* choose mutation probability
+* figure out how to represent individuals
+
+
+----------
+Algorithm:
+----------
+do:
+    -> let C be the empty set
+    -> for size_of_population:
+        -> choose parents p1 and p2 based on random distribution
+        -> c = cross(p1, p2)
+        -> with small prob. mutate(c)
+        -> add c to C
+    -> set P = C
+while individual_not_yet_found OR time_is_up
+-> return the most fit individual from the current population
