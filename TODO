@@ -1,0 +1,4 @@
+* Write recipes to file "recipe_list.dat" with form
+    "RECPE_NAME###ingr1###ingr2###...ingrn\n" 
+    -> load_recipes() should work with this
+

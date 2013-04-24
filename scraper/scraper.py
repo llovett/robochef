@@ -86,7 +86,7 @@ def logging():
             sys.stdout.flush()
         except Queue.Empty:
             pass
-        
+
 def startLogging():
     global LOGGING
     LOGGING = True
@@ -119,7 +119,7 @@ def print_associations(assoc):
             for a in associated:
                 print " "*10,a
             print
-                
+
 def load_associations(filename):
     '''Loads a table of ingredient associations from a file.
 
@@ -152,10 +152,22 @@ def load_associations(filename):
                     associations[i][ingredients[index]] = count
     return associations
 
+
+def load_recipes(filename):
+    '''Returns {recipe_name : [list_of_ingredients]}'''
+    recipes = {}
+    with codecs.open(filename, "r", "utf-8") as f:
+        for line in f:
+            unparsed_recipe = line.split("###")
+            recipe_name = unparsed_recipe[0]
+            recipes[recipe_name] = unparsed_recipe[1:]
+    return recipes
+
+
 def count_appearances(a, b, associations):
     '''Returns the number of times ingredient <a> appears with ingredient <b>,
     accordint to the associations table <associations>.
-    
+
     a, b are both strings.
     Returns an int.
     '''
