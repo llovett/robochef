@@ -37,8 +37,9 @@ def parseRecipe():
             exit()
         page = urllib2.urlopen(url)
         soup = BeautifulSoup(page)
+        recipe_name = soup.title.string.split("\r\n\t")[1].split(" Recipe")[0]
         ingredients_html = soup.find_all(id='liIngredient')
-        ingredients = []
+        ingredients = [recipe_name]
         for ingredient in ingredients_html:
             ing_amnt = float(ingredient.get('data-grams'))
             # Ignore "empty" ingredients (no amount)
@@ -152,7 +153,6 @@ def load_associations(filename):
                     associations[i][ingredients[index]] = count
     return associations
 
-
 def load_recipes(filename):
     '''Returns {recipe_name : [list_of_ingredients]}'''
     recipes = {}
@@ -204,15 +204,23 @@ if __name__ == '__main__':
     with codecs.open("ingredients_list.dat","w","utf-8") as f:
         allRecipes = allObject(_recipes)
         for recipe in allRecipes():
-            f.write("%s\n"%("###".join(ingredient[0] for ingredient in recipe)))
-            for ingredient in recipe:
-                for other_ingredient in recipe:
+            f.write("%s\n"%("###".join(ingredient[0] for ingredient in recipe[1:])))
+            for ingredient in recipe[1:]:
+                for other_ingredient in recipe[1:]:
                     if other_ingredient == ingredient:
                         continue
                     if not other_ingredient[0] in associations[ingredient[0]].keys():
                         associations[ingredient[0]][other_ingredient[0]] = 0
                     else:
                         associations[ingredient[0]][other_ingredient[0]] += 1
+
+    # write "recipe_name###ingr1###ingr2...###ingrn\n" for all recipes to file
+    with codecs.open("recipes_list.dat", "w", "utf-8") as f:
+        allRecipes = allObject(_recipes)
+        for recipe in allRecipes():
+            f.write("%s###" % recipe[0])
+            f.write("%s\n"%("###".join(ingredient[0] for ingredient in recipe[1:])))
+
 
     # Dump associations table into a file
     with codecs.open("associations.dat","w","utf-8") as f:
