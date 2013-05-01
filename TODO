@@ -1,16 +1,3 @@
-* Write recipes to file "recipe_list.dat" with form
-    "ingr1###ingr2###...ingrn\n" 
-    -> load_recipes() should work with this
-
-* put fitness functions in fitness.py, create fitness module
-    * fitness functions should take one parameter, <population>, which
-      is a list of recipes, where each recipe is a list of ingredients,
-      and return a single individual
-    * healthy, dank fitness functions to be written
-
-* genetic algorithm:
-    * implement cross, mutate
-    * make choose_parents() use a proper weighted distribution
-
 * python:
     * make fitness a module
+    * make our program share a common association table

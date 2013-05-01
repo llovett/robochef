@@ -37,9 +37,8 @@ def parseRecipe():
             exit()
         page = urllib2.urlopen(url)
         soup = BeautifulSoup(page)
-        recipe_name = soup.title.string.split("\r\n\t")[1].split(" Recipe")[0]
         ingredients_html = soup.find_all(id='liIngredient')
-        ingredients = [recipe_name]
+        ingredients = []
         for ingredient in ingredients_html:
             ing_amnt = float(ingredient.get('data-grams'))
             # Ignore "empty" ingredients (no amount)
@@ -143,7 +142,8 @@ def load_associations(filename):
     # Dump associations table into a file
     with codecs.open(filename,"r","utf-8") as f:
         # Get list of ingredients
-        ingredients = ["%s"%s for s in f.readline().split("###")]
+        # CHANGED -> using rstrip() to remove "\n"s
+        ingredients = ["%s"%s.rstrip() for s in f.readline().split("###")]
         for i in ingredients:
             associations[i] = {}
             counts = []
@@ -152,17 +152,6 @@ def load_associations(filename):
                 if count > 0:
                     associations[i][ingredients[index]] = count
     return associations
-
-def load_recipes(filename):
-    '''Returns {recipe_name : [list_of_ingredients]}'''
-    recipes = {}
-    with codecs.open(filename, "r", "utf-8") as f:
-        for line in f:
-            unparsed_recipe = line.split("###")
-            recipe_name = unparsed_recipe[0]
-            recipes[recipe_name] = unparsed_recipe[1:]
-    return recipes
-
 
 def count_appearances(a, b, associations):
     '''Returns the number of times ingredient <a> appears with ingredient <b>,
@@ -213,14 +202,6 @@ if __name__ == '__main__':
                         associations[ingredient[0]][other_ingredient[0]] = 0
                     else:
                         associations[ingredient[0]][other_ingredient[0]] += 1
-
-    # write "recipe_name###ingr1###ingr2...###ingrn\n" for all recipes to file
-    with codecs.open("recipes_list.dat", "w", "utf-8") as f:
-        allRecipes = allObject(_recipes)
-        for recipe in allRecipes():
-            f.write("%s###" % recipe[0])
-            f.write("%s\n"%("###".join(ingredient[0] for ingredient in recipe[1:])))
-
 
     # Dump associations table into a file
     with codecs.open("associations.dat","w","utf-8") as f:

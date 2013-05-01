@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import scraper.scraper as scraper
-
+table = scraper.load_associations("associations.dat")
+ingredients = table.keys()
 
 def balanced(recipe):
     """Returns a value describing how balanced a given recipe is. Balance
@@ -14,12 +15,14 @@ def balanced(recipe):
     :returns: integer value
 
     """
-    balance = 0
-    table = scraper.load_associations("associations.dat")
+    balance = 0.0
+    max_balance = float( len(recipe) * len(recipe) * len(ingredients) ) # max. is every ingredient appears w/ every other ingredient in every recipe
+    # table = scraper.load_associations("associations.dat")
     for ingr1 in recipe:
         for ingr2 in recipe:
             if ingr1 != ingr2:
                 balance = balance + scraper.count_appearances(ingr1, ingr2, table)
+    return balance / max_balance  # normalize
 
 
 def most_fit(population, fitness_func):
@@ -30,4 +33,4 @@ def most_fit(population, fitness_func):
     :returns: most fit recipe in <population>
 
     """
-    return max(map(fitness_func), population)
+    return max(population, key=fitness_func)

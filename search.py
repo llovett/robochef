@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-# import fitness
+import codecs
+from fitness import *
 import random
 import scraper.scraper as scraper
 
@@ -7,6 +8,23 @@ import scraper.scraper as scraper
 ######################
 #  helper functions  #
 ######################
+
+def generate_population(size):
+    """Generates a random population of size :size: from ingredients
+    in :table:"""
+    ingredients = []
+    recipes = []
+    # fill ingredients list
+    with codecs.open("ingredients_list.dat", "rb", "utf-8") as f:
+        ingredients += [ingr.rstrip() for line in f for ingr in line.split("###")]
+
+    while len(recipes) < size:
+        recipe = set()
+        # for now, all recipes of length 10
+        while len(recipe) < 10:
+            recipe.add(random.choice(ingredients))
+        recipes.append(recipe)
+    return recipes
 
 def choose_parents(population, fitness_func):
     """Chooses the two most fit individuals from <table> based on
@@ -17,11 +35,67 @@ def choose_parents(population, fitness_func):
     population
     :returns: a list of the two fittest recipes
 
+    THIS CAN BE A BOTTLENECK
+
     """
-    # assume fitness_func returns the correct list
-    parent1 = fitness_func(population)
-    parent2 = fitness_func(recipe for recipe in population if recipe != parent1)
+    parent1 = max( population, key = lambda x : fitness_func(x) )
+    parent2 = max( [recipe for recipe in population if recipe != parent1],
+                   key = lambda x : fitness_func(x) )
+    # parent1 = random.choice(population)
+    # parent2 = random.choice(population)
+    # while parent1 == parent2:
+    #     parent2 = random.choice(population)
+    # print "Chose some parents."
     return (parent1, parent2)
+
+
+def cross(recip1, recip2):
+    """Crosses :recip1: with :recip2:, returning the resulting recipe.
+    Currently using arbitrary crossover point."""
+
+    # cross_point = len(recip1) / 2
+    # return recip1[:cross_point] + recip2[cross_point:]
+
+    # print "received recip1, recip2 from run_genetic():\n"
+    # print recip1
+    # print recip2
+    ret = set()
+    while len(ret) < len(recip1):
+        if random.randint(0, 1) == 0:
+            ret.add(random.sample(recip1, 1)[0])           
+        else:
+            ret.add(random.sample(recip2, 1)[0])
+    # print "returning %s from cross()" % str(ret)
+    return ret
+
+def mutate(recipe):
+    """Mutates :recipe: by grabbing a random ingredient, and adding to the
+    recipe the ingredient which occurs most often with the randomly selected
+    ingredient.
+
+    :recipe: list of ingredients
+    :table: association table
+    :returns: new recipe
+
+    """
+    rand_ingr = random.choice(table.keys())
+    while rand_ingr in recipe:
+        rand_ingr = random.choice(table.keys())
+    ret = set(random.sample(recipe, len(recipe) - 1))
+    ret.add(rand_ingr)
+    return ret
+    # ingr_chosen = False
+    # ingr1 = ""
+    # ingr2 = ""
+    # for ingr1 in recipe:  # try until we've entirely failed
+    #     ingr2 = max( table[ingr1].items(), key = lambda x : x[1] )[0]
+    #     if ingr2 is not None and ingr2 not in recipe:
+    #         ret = set([ingr for ingr in recipe if ingr != ingr1])
+    #         ret.add(ingr2)
+    #         return ret
+    # # otherwise, just choose a random recipe from the table
+    # return set([ingr for ingr in recipe if ingr != ingr1].append(random.choice(table.keys())))
+    
 
 
 def run_genetic(population, timeout, fitness_func, fitness_thresh, mutation_prob):
@@ -37,6 +111,9 @@ def run_genetic(population, timeout, fitness_func, fitness_thresh, mutation_prob
     i = 0
 
     while not individual_found and i < timeout:
+        # print "size of current population: %d" % len(population)
+        # if i % 20 == 0:
+        print "...iteration %d" % i
         C = []  # child population
         for x in xrange(len(population)):
             p1, p2 = choose_parents(population, fitness_func)
@@ -48,20 +125,24 @@ def run_genetic(population, timeout, fitness_func, fitness_thresh, mutation_prob
                 individual_found = True
 
             C.append(child)
-            population = C
-            i = i + 1
-    return most_fit(population, fitness_func)
+        # print "size of child population: %d" % len(C)
+        population = C
+        i += 1
+    the_one = most_fit(population, fitness_func)
+    print "Returning most fit (%f) individual" % fitness_func(the_one)
+    return the_one
 
 
 
 def main():
-    table = scraper.load_associations("associations.dat")
-    # ingredients = scraper.load_recipes("ingredients_list.dat")
-    # print table
-    # print ingredients
-    print "balsamic vinegar: " + str(table["balsamic vinegar"])
-    print "... occurs with salt %d times" % scraper.count_appearances("balsamic vinegar", "salt", table)
-    print "... occurs with itself %d times" % scraper.count_appearances("balsamic vinegar", "balsamic vinegar", table)
+    # table = scraper.load_associations("associations.dat")
+    # print "balsamic vinegar: " + str(table["balsamic vinegar"])
+    # print "thinly sliced red bell pepper" + str(table["thinly sliced red bell pepper"])
+    # print "... occurs with salt %d times" % scraper.count_appearances("balsamic vinegar", "salt", table)
+    # print "... occurs with itself %d times" % scraper.count_appearances("balsamic vinegar", "balsamic vinegar", table)
+
+    # run_genetic(population, timeout, fitness_func, fitness_thresh, mutation_prob)
+    pass
 
 
 if __name__ == '__main__':
