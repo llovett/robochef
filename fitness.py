@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 import scraper.scraper as scraper
+healthlist = file("healthy.txt")
+danklist = file("danklist.txt")
+dank = danklist.read()
+healthy = healthlist.read()
 
 
 def balanced(recipe):
@@ -31,3 +35,23 @@ def most_fit(population, fitness_func):
 
     """
     return max(map(fitness_func), population)
+
+"""Returns a number between 0 and 1 with the percentage of healthy ingredients in input recipe."""
+
+def healthy(recip):
+           numhealth = 0
+           for ingred in recip:
+              if  ingred in healthy
+               numhealth += 1
+           return numhealth/len(recip)
+
+"""Returns """Returns a number between 0 and 1 with the percentage of dank  ingredients in input recipe."""
+
+def dank (recip):
+           dank  = 0
+           for ingred  in recip:
+                     if  ingred in dank:
+                      dank  += 1
+           return dank/len(ingredianlist)
+
+
