@@ -1,0 +1,34 @@
+ Bob Evans\'ae Italian Sausage Roll###\
+Parmesan cheese\
+potatoes###\
+eggs###\
+diced dill pickles###\
+mayonnaise###\
+spicy mustard###\
+white sugar###\
+ketchup###\
+vegetable oil\
+olive oil###\
+chile-garlic sauce (such as Sriracha\'ae)###\
+honey###\
+crumbled feta cheese###\
+jalapeno pepper, diced###\
+cooked medium shrimp, peeled and deveined###i\
+avocados, peeled and diced###\
+jalapeno peppers, seeded and finely diced###\
+cubed fontina cheese###\
+pitted and chopped kalamata olives###\
+day-old Italian bread, cubed###\
+minced fresh mint (chocolate mint preferred)###l\
+honey (fireweed honey preferred)###\
+miniature marshmallows###\
+sour cream###\
+olive oil###\
+teriyaki sauce###\
+crushed red pepper flakes###\
+chicken
+salt
+butter
+
+
+}

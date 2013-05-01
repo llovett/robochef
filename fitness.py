@@ -2,6 +2,10 @@
 import scraper.scraper as scraper
 table = scraper.load_associations("associations.dat")
 ingredients = table.keys()
+healthlist = file("healthy.txt")
+danklist = file("danklist.txt")
+dank = danklist.read()
+healthy = healthlist.read()
 
 def balanced(recipe):
     """Returns a value describing how balanced a given recipe is. Balance
@@ -34,3 +38,19 @@ def most_fit(population, fitness_func):
 
     """
     return max(population, key=fitness_func)
+
+def healthy(recip):
+    """Returns a number between 0 and 1 with the percentage of healthy ingredients in input recipe."""
+    numhealth = 0
+    for ingred in recip:
+        if  ingred in healthy:
+            numhealth += 1
+        return numhealth/len(recip)
+
+def dank (recip):
+    """Returns a number between 0 and 1 with the percentage of dank  ingredients in input recipe."""
+    dank  = 0
+    for ingred  in recip:
+        if  ingred in dank:
+            dank  += 1
+    return dank/len(ingredianlist)
