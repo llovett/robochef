@@ -42,16 +42,16 @@ def most_fit(population, fitness_func):
 
 def healthy(recip):
     """Returns a number between 0 and 1 with the percentage of healthy ingredients in input recipe."""
-    numhealth = 0
+    health_count = 0
     for ingred in recip:
         if ingred in healthy_string:
-            numhealth += 1
-        return numhealth/len(recip)
+            health_count += 1
+        return float(health_count)/len(recip)
 
 def dank (recip):
     """Returns a number between 0 and 1 with the percentage of dank  ingredients in input recipe."""
-    dank  = 0
+    dank_count  = 0
     for ingred  in recip:
         if ingred in dank_string:
-            dank  += 1
-    return dank/len(recip)
+            dank_count  += 1
+    return float(dank_count)/len(recip)

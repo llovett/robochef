@@ -52,20 +52,12 @@ def choose_parents(population, fitness_func):
 def cross(recip1, recip2):
     """Crosses :recip1: with :recip2:, returning the resulting recipe.
     Currently using arbitrary crossover point."""
-
-    # cross_point = len(recip1) / 2
-    # return recip1[:cross_point] + recip2[cross_point:]
-
-    # print "received recip1, recip2 from run_genetic():\n"
-    # print recip1
-    # print recip2
     ret = set()
     while len(ret) < len(recip1):
         if random.randint(0, 1) == 0:
             ret.add(random.sample(recip1, 1)[0])           
         else:
             ret.add(random.sample(recip2, 1)[0])
-    # print "returning %s from cross()" % str(ret)
     return ret
 
 def mutate(recipe):
@@ -84,20 +76,7 @@ def mutate(recipe):
     ret = set(random.sample(recipe, len(recipe) - 1))
     ret.add(rand_ingr)
     return ret
-    # ingr_chosen = False
-    # ingr1 = ""
-    # ingr2 = ""
-    # for ingr1 in recipe:  # try until we've entirely failed
-    #     ingr2 = max( table[ingr1].items(), key = lambda x : x[1] )[0]
-    #     if ingr2 is not None and ingr2 not in recipe:
-    #         ret = set([ingr for ingr in recipe if ingr != ingr1])
-    #         ret.add(ingr2)
-    #         return ret
-    # # otherwise, just choose a random recipe from the table
-    # return set([ingr for ingr in recipe if ingr != ingr1].append(random.choice(table.keys())))
     
-
-
 def run_genetic(population, timeout, fitness_func, fitness_thresh, mutation_prob):
     """Runs a genetic algorithm on :population: of recipes until a fit enough
     recipe is created or :timeout: is reached
