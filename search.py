@@ -56,7 +56,6 @@ def choose_parents(population, fitness_func):
     # Randomly select from this subset
     parent1 = random.choice(subset)
     subset.remove(parent1)
-    # Avoid infinite loop for small subset
     if len(subset) == 0:
         parent2 = random.choice(population)
     else:
