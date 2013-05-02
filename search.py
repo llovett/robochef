@@ -1,9 +1,12 @@
 #!/usr/bin/env python
+
 import codecs
 from fitness import *
 import random
 import scraper.scraper as scraper
 import sys
+
+NUM_THREADS = 50
 
 ######################
 #  helper functions  #
@@ -38,16 +41,27 @@ def choose_parents(population, fitness_func):
     THIS CAN BE A BOTTLENECK
 
     """
-    parent1 = max( population, key = lambda x : fitness_func(x) )
-    parent2 = max( [recipe for recipe in population if recipe != parent1],
-                   key = lambda x : fitness_func(x) )
-    # parent1 = random.choice(population)
-    # parent2 = random.choice(population)
-    # while parent1 == parent2:
-    #     parent2 = random.choice(population)
-    # print "Chose some parents."
-    return (parent1, parent2)
-
+    # Randomly select 1/10th of the population
+    subset = [random.choice(population) for i in xrange(len(population)/10)]
+    # Sort by fitness
+    def comparison(x,y):
+        f = fitness_func
+        if f(x) > f(y):
+            return 1
+        elif f(y) > f(x):
+            return -1
+        return 0
+    # Take the 50% most fit individuals
+    subset = sorted(subset, cmp=comparison)[len(subset)/2:]
+    # Randomly select from this subset
+    parent1 = random.choice(subset)
+    subset.remove(parent1)
+    # Avoid infinite loop for small subset
+    if len(subset) == 0:
+        parent2 = random.choice(population)
+    else:
+        parent2 = random.choice(subset)
+    return parent1, parent2
 
 def cross(recip1, recip2):
     """Crosses :recip1: with :recip2:, returning the resulting recipe.
@@ -90,8 +104,6 @@ def run_genetic(population, timeout, fitness_func, fitness_thresh, mutation_prob
     i = 0
 
     while not individual_found and i < timeout:
-        # print "size of current population: %d" % len(population)
-        # if i % 20 == 0:
         print "...iteration %d" % i
         C = []  # child population
         for x in xrange(len(population)):
@@ -104,7 +116,6 @@ def run_genetic(population, timeout, fitness_func, fitness_thresh, mutation_prob
                 individual_found = True
 
             C.append(child)
-        # print "size of child population: %d" % len(C)
         population = C
         i += 1
     the_one = most_fit(population, fitness_func)
@@ -112,6 +123,7 @@ def run_genetic(population, timeout, fitness_func, fitness_thresh, mutation_prob
     return the_one
 
 def main():
+    # Parse args
     if len(sys.argv) < 4:
         print "USAGE: python search.py <population size> <iterations> <balanced|dank|healthy> [mutation prob]"
         exit(0)
@@ -122,10 +134,12 @@ def main():
     if len(sys.argv) == 5:
         mut_prob = float(sys.argv[4])
 
+    # Map arg to fitness function
     fitnesses = {'balanced':balanced,
                  'dank':dank,
                  'healthy':healthy}
 
+    # This runs the genetic algorithm as specified
     most_fit = run_genetic(generate_population(pop_sz),
                            iterations,
                            fitnesses[fit_func],

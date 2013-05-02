@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import scraper.scraper as scraper
+from itertools import combinations
 table = scraper.load_associations("associations.dat")
 ingredients = table.keys()
 healthlist = file("healthy.txt")
@@ -23,11 +24,10 @@ def balanced(recipe):
     # max. is every ingredient appears w/ every other ingredient in every recipe
     max_balance = float( len(recipe) * len(recipe) * len(ingredients) ) 
     # table = scraper.load_associations("associations.dat")
-    for ingr1 in recipe:
-        for ingr2 in recipe:
-            if ingr1 != ingr2:
-                balance = balance + scraper.count_appearances(ingr1, ingr2, table)
-    return balance / max_balance  # normalize
+    for ingr1, ingr2 in combinations(recipe, 2):
+        balance = balance + scraper.count_appearances(ingr1, ingr2, table)
+    # normalize
+    return balance / max_balance  
 
 
 def most_fit(population, fitness_func):
