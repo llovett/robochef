@@ -4,8 +4,8 @@ table = scraper.load_associations("associations.dat")
 ingredients = table.keys()
 healthlist = file("healthy.txt")
 danklist = file("danklist.txt")
-dank = danklist.read()
-healthy = healthlist.read()
+dank_string = danklist.read()
+healthy_string = healthlist.read()
 
 def balanced(recipe):
     """Returns a value describing how balanced a given recipe is. Balance
@@ -20,7 +20,8 @@ def balanced(recipe):
 
     """
     balance = 0.0
-    max_balance = float( len(recipe) * len(recipe) * len(ingredients) ) # max. is every ingredient appears w/ every other ingredient in every recipe
+    # max. is every ingredient appears w/ every other ingredient in every recipe
+    max_balance = float( len(recipe) * len(recipe) * len(ingredients) ) 
     # table = scraper.load_associations("associations.dat")
     for ingr1 in recipe:
         for ingr2 in recipe:
@@ -43,7 +44,7 @@ def healthy(recip):
     """Returns a number between 0 and 1 with the percentage of healthy ingredients in input recipe."""
     numhealth = 0
     for ingred in recip:
-        if  ingred in healthy:
+        if ingred in healthy_string:
             numhealth += 1
         return numhealth/len(recip)
 
@@ -51,6 +52,6 @@ def dank (recip):
     """Returns a number between 0 and 1 with the percentage of dank  ingredients in input recipe."""
     dank  = 0
     for ingred  in recip:
-        if  ingred in dank:
+        if ingred in dank_string:
             dank  += 1
-    return dank/len(ingredianlist)
+    return dank/len(recip)

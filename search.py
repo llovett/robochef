@@ -3,7 +3,7 @@ import codecs
 from fitness import *
 import random
 import scraper.scraper as scraper
-
+import sys
 
 ######################
 #  helper functions  #
@@ -132,18 +132,29 @@ def run_genetic(population, timeout, fitness_func, fitness_thresh, mutation_prob
     print "Returning most fit (%f) individual" % fitness_func(the_one)
     return the_one
 
-
-
 def main():
-    # table = scraper.load_associations("associations.dat")
-    # print "balsamic vinegar: " + str(table["balsamic vinegar"])
-    # print "thinly sliced red bell pepper" + str(table["thinly sliced red bell pepper"])
-    # print "... occurs with salt %d times" % scraper.count_appearances("balsamic vinegar", "salt", table)
-    # print "... occurs with itself %d times" % scraper.count_appearances("balsamic vinegar", "balsamic vinegar", table)
+    if len(sys.argv) < 4:
+        print "USAGE: python search.py <population size> <iterations> <balanced|dank|healthy> [mutation prob]"
+        exit(0)
+    pop_sz = int(sys.argv[1])
+    iterations = int(sys.argv[2])
+    fit_func = sys.argv[3]
+    mut_prob = 0.01
+    if len(sys.argv) == 5:
+        mut_prob = float(sys.argv[4])
 
-    # run_genetic(population, timeout, fitness_func, fitness_thresh, mutation_prob)
-    pass
+    fitnesses = {'balanced':balanced,
+                 'dank':dank,
+                 'healthy':healthy}
 
+    most_fit = run_genetic(generate_population(pop_sz),
+                           iterations,
+                           fitnesses[fit_func],
+                           100, # Ignoring fitness threshold argument
+                           mut_prob)
 
+    print "Bon Apetit! --- "
+    print most_fit
+    
 if __name__ == '__main__':
     main()
