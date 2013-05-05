@@ -1,0 +1,20 @@
+# python search.py 200 50 healthy 0.2
+-------------------------------------
+-> set([u'fresh ginger root', u'whipped topping (such as Cool Whip\xae)', u'finely chopped green onions', u'chopped broccoli florets', u'chopped cremini mushrooms', u'red bell pepper, cut into bite-size pieces', u'garbanzo beans, drained and rinsed twice', u'toasted slivered almonds', u'romaine lettuce, torn', u'rice vinegar'])
+-> set([u'carrots, sliced', u'red wine vinegar', u'maraschino cherries, drained and halved', u'watermelon, fruit removed with a melon baller', u'flank steak', u'thinly sliced orange bell pepper', u'dried lavender, crushed', u'Lettuce', u'vinegar', u'thinly sliced red bell pepper'])
+
+# python search.py 200 50 dank 0.2
+----------------------------------
+-> set([u'vegetable oil', u'Parmesan cheese', u'mustard', u'cooked medium shrimp, peeled and deveined', u'olive oil', u'avocados, peeled and diced', u'mayonnaise', u'salt', u'ketchup', u'red pepper flakes'])
+-> set([u'olive oil', u'day-old Italian bread, cubed', u'fontina cheese', u'miniature marshmallows', u'mayonnaise', u'sour cream', u'cooked medium shrimp, peeled and deveined', u'ketchup', u'red pepper flakes', u'bread'])
+
+# python search.py 200 50 balanced 0.2
+--------------------------------------
+-> set([u'olive oil', u'red wine vinegar', u'ground black pepper', u'garlic, minced', u'lemon juice', u'extra-virgin olive oil', u'white sugar', u'balsamic vinegar', u'mayonnaise', u'salt'])
+-> set([u'olive oil', u'red wine vinegar', u'ground black pepper', u'garlic, minced', u'lemon juice', u'white sugar', u'balsamic vinegar', u'mayonnaise', u'salt', u'chopped fresh cilantro'])
+
+
+
+# python search.py 100 20 healthy 0.2
+-------------------------------------
+-> set([u'olive oil', u'russet potatoes, peeled and cubed', u'mesclun salad greens with spinach and/or arugula', u'roasted turkey, julienned', u'bottled Caesar salad dressing', u'couscous', u'DOLE White or Brown Mushrooms, sliced', u'black beans, rinsed and drained', u'pomegranate seeds', u'baby spinach leaves'])
