@@ -68,7 +68,7 @@ def cross(recip1, recip2):
     ret = set()
     while len(ret) < len(recip1):
         if random.randint(0, 1) == 0:
-            ret.add(random.sample(recip1, 1)[0])           
+            ret.add(random.sample(recip1, 1)[0])
         else:
             ret.add(random.sample(recip2, 1)[0])
     return ret
@@ -89,7 +89,7 @@ def mutate(recipe):
     ret = set(random.sample(recipe, len(recipe) - 1))
     ret.add(rand_ingr)
     return ret
-    
+
 def run_genetic(population, timeout, fitness_func, fitness_thresh, mutation_prob):
     """Runs a genetic algorithm on :population: of recipes until a fit enough
     recipe is created or :timeout: is reached
@@ -102,7 +102,7 @@ def run_genetic(population, timeout, fitness_func, fitness_thresh, mutation_prob
     individual_found = False
     i = 0
 
-    while not individual_found and i < timeout:
+    while i < timeout:
         print "...iteration %d" % i
         C = []  # child population
         for x in xrange(len(population)):
@@ -112,7 +112,7 @@ def run_genetic(population, timeout, fitness_func, fitness_thresh, mutation_prob
             if random.random() < mutation_prob:
                 child = mutate(child)
             if fitness_func(child) >= fitness_thresh:
-                individual_found = True
+                return child
 
             C.append(child)
         population = C
@@ -147,6 +147,6 @@ def main():
 
     print "Bon Apetit! --- "
     print most_fit
-    
+
 if __name__ == '__main__':
     main()
